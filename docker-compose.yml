@@ -1,0 +1,28 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file: .env
+    volumes:
+      - bot_data:/data
+    restart: unless-stopped
+
+  # Nginx is only needed in webhook mode.
+  # Comment out (or remove) when running in polling mode.
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - bot
+    restart: unless-stopped
+    profiles:
+      - webhook
+
+volumes:
+  bot_data:

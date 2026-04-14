@@ -1,3 +1,27 @@
 .*
 !.gitignore
+!.env.example
 *.local.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Data volumes (mounted in Docker)
+/data/
+
+# Test artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
