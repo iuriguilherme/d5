@@ -30,11 +30,19 @@ def settings(tmp_path: Path) -> Settings:
 @pytest.fixture
 async def db_engine(settings: Settings):
     """In-memory async SQLite engine with all models created."""
-    # Import here so models register on Base.metadata before create_all
-    from bot.models.base import Base  # noqa: F401 — triggers all model imports
-    import bot.models  # noqa: F401
+    from sqlalchemy import event
+
+    import bot.models  # noqa: F401 — registers all models on Base.metadata
+    from bot.models.base import Base
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+
+    @event.listens_for(engine.sync_engine, "connect")
+    def _set_pragmas(dbapi_conn, _connection_record):
+        cursor = dbapi_conn.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield engine
