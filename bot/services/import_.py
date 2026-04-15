@@ -32,6 +32,10 @@ class ImportService:
         self._prediction = prediction_service
         self._data_dir = data_dir
 
+    @property
+    def data_dir(self) -> Path:
+        return self._data_dir
+
     async def process(
         self,
         user_id: int,
@@ -84,10 +88,20 @@ class ImportService:
 
         # Fire clustering in background — non-critical, don't block handler response
         if self._prediction is not None:
-            asyncio.create_task(
+            task = asyncio.create_task(
                 self._prediction.cluster_import(
                     user_id, batch_id, self._session_factory, bot=bot
                 )
+            )
+            task.add_done_callback(
+                lambda t: logger.error(
+                    "cluster_import_failed",
+                    user_id=user_id,
+                    batch_id=str(batch_id),
+                    error=str(t.exception()),
+                )
+                if not t.cancelled() and t.exception() is not None
+                else None
             )
 
         return batch
@@ -102,6 +116,10 @@ class ImportService:
         extract_dir.mkdir(parents=True, exist_ok=True)
 
         with zipfile.ZipFile(file_path) as zf:
+            for member in zf.namelist():
+                member_path = (extract_dir / member).resolve()
+                if not str(member_path).startswith(str(extract_dir.resolve())):
+                    raise ValueError(f"Unsafe ZIP member path: {member!r}")
             zf.extractall(extract_dir)
 
         return extract_dir

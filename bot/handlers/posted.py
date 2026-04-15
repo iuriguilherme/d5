@@ -172,18 +172,21 @@ async def posted_receive_caption(
     await _finalize_post_msg(message, state, session, caption=caption)
 
 
-async def _finalize_post(
-    callback: CallbackQuery,
+async def _save_post(
+    user_id: int,
     state: FSMContext,
     session: AsyncSession,
     caption: str | None,
-) -> None:
+) -> tuple[str, str]:
+    """Persist the Post record and clear FSM state.
+
+    Returns (label, platform) for the confirmation message.
+    """
+    from uuid import UUID
+
     data = await state.get_data()
-    user_id = callback.from_user.id  # type: ignore[union-attr]
     platform = data.get("platform", "other")
     subject_id_str = data.get("subject_id")
-
-    from uuid import UUID
 
     subject = None
     if subject_id_str:
@@ -206,6 +209,17 @@ async def _finalize_post(
     await state.clear()
 
     label = subject.text if subject else "(no subject)"
+    return label, platform
+
+
+async def _finalize_post(
+    callback: CallbackQuery,
+    state: FSMContext,
+    session: AsyncSession,
+    caption: str | None,
+) -> None:
+    user_id = callback.from_user.id  # type: ignore[union-attr]
+    label, platform = await _save_post(user_id, state, session, caption)
     await callback.message.edit_text(  # type: ignore[union-attr]
         f"Logged! ✓ <b>{label}</b> posted to {platform.title()}",
         parse_mode="HTML",
@@ -220,34 +234,8 @@ async def _finalize_post_msg(
     session: AsyncSession,
     caption: str | None,
 ) -> None:
-    data = await state.get_data()
     user_id = message.from_user.id  # type: ignore[union-attr]
-    platform = data.get("platform", "other")
-    subject_id_str = data.get("subject_id")
-
-    from uuid import UUID
-
-    subject = None
-    if subject_id_str:
-        subject = await session.get(Subject, UUID(subject_id_str))
-
-    post = Post(
-        user_id=user_id,
-        subject_id=UUID(subject_id_str) if subject_id_str else None,
-        platform=PostPlatform(platform),
-        source=PostSource.manual_confirm,
-        posted_at=datetime.now(timezone.utc),
-        caption_excerpt=caption,
-    )
-    session.add(post)
-
-    if subject:
-        subject.last_posted_at = post.posted_at
-
-    await session.commit()
-    await state.clear()
-
-    label = subject.text if subject else "(no subject)"
+    label, platform = await _save_post(user_id, state, session, caption)
     await message.answer(
         f"Logged! ✓ <b>{label}</b> posted to {platform.title()}",
         parse_mode="HTML",

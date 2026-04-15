@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
 from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String
@@ -16,4 +16,6 @@ class ImportBatch(Base):
     platform: Mapped[str] = mapped_column(String(32), nullable=False)
     file_path: Mapped[str] = mapped_column(String(512), nullable=False)
     record_count: Mapped[int] = mapped_column(Integer, default=0)
-    imported_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    imported_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
+    )

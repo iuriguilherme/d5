@@ -78,7 +78,7 @@ async def import_receive_file(
         await message.answer("Please send a file.")
         return
 
-    if doc.file_size and doc.file_size > MAX_FILE_BYTES:
+    if doc.file_size is not None and doc.file_size > MAX_FILE_BYTES:
         await message.answer(
             "File too large (max 20 MB). Please compress it and try again."
         )
@@ -93,7 +93,7 @@ async def import_receive_file(
     from bot.config import Settings
 
     # Resolve the data_dir from import_service
-    data_dir: Path = import_service._data_dir
+    data_dir: Path = import_service.data_dir
     dest_dir = data_dir / "imports" / str(user_id)
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest_path = dest_dir / f"{batch_id}.zip"

@@ -260,6 +260,19 @@ async def reminder_fire_handler(
 # ── Post / Skip / Another callbacks ──────────────────────────────────────────
 
 
+@router.callback_query(F.data.startswith("sched:post:"))
+async def sched_post(callback: CallbackQuery) -> None:
+    """User chose 'Post this' from a reminder suggestion.
+
+    Remove the suggestion keyboard and prompt them to log via /posted.
+    """
+    await callback.message.edit_reply_markup(reply_markup=None)  # type: ignore[union-attr]
+    await callback.message.answer(  # type: ignore[union-attr]
+        "Great! Use /posted to log what you posted.",
+    )
+    await callback.answer()
+
+
 @router.callback_query(F.data.startswith("sched:skip:"))
 async def sched_skip(callback: CallbackQuery, session: AsyncSession) -> None:
     from datetime import datetime, timezone
