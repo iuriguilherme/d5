@@ -202,11 +202,11 @@ Simplest possible approach. Fires a script at scheduled times. Pros: zero Python
 Full distributed task queue with a separate beat scheduler. Pros: scales to many users, persists jobs in a broker. Cons: requires Redis or RabbitMQ — heavyweight for a single-user bot; adds two new services to deploy.
 
 **Option C — APScheduler (asyncio-native, in-process) (Recommended)**
-Runs inside the same async event loop as the Aiogram bot. Jobs are stored in SQLite via `AsyncSQLAlchemyJobStore`, surviving restarts. Supports cron, interval, and one-shot triggers. Can add/modify/remove jobs at runtime through the bot conversation.
+Runs inside the same async event loop as the Aiogram bot. Jobs are stored in SQLite via `SQLAlchemyJobStore` (synchronous), surviving restarts. Supports cron, interval, and one-shot triggers. Can add/modify/remove jobs at runtime through the bot conversation.
 
 ### Recommended Approach
 
-`APScheduler` with `AsyncIOScheduler`, backed by `AsyncSQLAlchemyJobStore` writing to the same SQLite database (separate `apscheduler_jobs` table). Each active `Reminder` record maps 1:1 to an APScheduler job keyed by `reminder_id`.
+`APScheduler` with `AsyncIOScheduler`, backed by `SQLAlchemyJobStore` (synchronous, `sqlite:///` URL) writing to the same SQLite database (separate `apscheduler_jobs` table). Note: `AsyncSQLAlchemyJobStore` does not exist in APScheduler 3.x — that is a 4.x-only class. Each active `Reminder` record maps 1:1 to an APScheduler job keyed by `reminder_id`.
 
 When a user changes their schedule via `/schedule`, the bot:
 1. Updates the `Reminder` record in SQLite.
