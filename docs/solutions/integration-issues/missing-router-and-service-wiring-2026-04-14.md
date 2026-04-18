@@ -251,4 +251,5 @@ imported_at: Mapped[datetime] = mapped_column(
 ## Related Issues
 
 - `docs/plans/2026-04-13-001-feat-social-media-organizer-telegram-bot-plan.md` — Unit 4 (dispatcher setup) and Unit 5 (APScheduler) describe intended correct behavior; this doc covers the failure modes discovered during review.
-- `docs/brainstorms/social-media-organizer.md` §3 — Contains stale reference to `AsyncSQLAlchemyJobStore` (does not exist in APScheduler 3.x); correct class is `SQLAlchemyJobStore` with sync `sqlite:///` URL.
+- `docs/brainstorms/social-media-organizer.md` §3 — Corrected in commits `1145eb4` and `c716381`; previously referenced `AsyncSQLAlchemyJobStore` which does not exist in APScheduler 3.x.
+- `docs/solutions/documentation-gaps/apscheduler-3x-no-async-sqlalchemy-job-store-2026-04-18.md` — Dedicated knowledge-track doc on the APScheduler 3.x/4.x job store API split (`SQLAlchemyJobStore` sync vs `AsyncSQLAlchemyJobStore` 4.x-only).
