@@ -456,7 +456,7 @@ Embedding-based clustering is the right first step: it surfaces real patterns fr
 | Embeddings | sentence-transformers `all-MiniLM-L6-v2` | Local, free, 384-dim |
 | Clustering | scikit-learn DBSCAN | CPU-only, fast at this scale |
 | LLM (optional) | OpenAI GPT-4o-mini or Ollama | Configurable via env; graceful fallback if unset |
-| Scheduler | APScheduler 4.x asyncio | Jobs stored in same SQLite DB |
+| Scheduler | APScheduler 3.x asyncio | Jobs stored in same SQLite DB via SQLAlchemyJobStore (synchronous) |
 | ORM | SQLAlchemy 2.x async | Models + migrations via Alembic |
 | Config | pydantic-settings + `.env` | Type-safe config, 12-factor |
 | Logging | Python `logging` + `structlog` | JSON structured logs |
@@ -646,7 +646,7 @@ All extension points are designed around the Open/Closed Principle: add new beha
 
 6. **[Affects prediction] Technical:** DBSCAN epsilon and min_samples hyperparameters for the clustering step need empirical tuning. A reasonable starting default (epsilon=0.3, min_samples=2) should be validated against a small sample of real posting history before shipping.
 
-7. **[Affects scheduler] Technical:** APScheduler 4.x asyncio integration with Aiogram 3's event loop requires verifying that the scheduler is attached to the correct loop instance. This is a known integration concern and should be validated with a minimal prototype.
+7. **[Affects scheduler] Resolved:** APScheduler 3.x asyncio integration with Aiogram 3's event loop — resolved by starting `AsyncIOScheduler` inside Aiogram's `on_startup` hook. This shares the already-running event loop. Note: APScheduler 4.x has an entirely different API (`AsyncScheduler` + `SQLAlchemyDataStore`); the project uses 3.x with `SQLAlchemyJobStore` (synchronous, `sqlite:///` URL).
 
 8. **[Affects deployment] Needs research:** SQLite WAL mode behavior under concurrent reads from the bot handler and APScheduler writer. At single-user scale this is unlikely to be a problem, but WAL mode should be explicitly enabled in the SQLAlchemy engine config.
 
