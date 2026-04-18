@@ -8,7 +8,7 @@ There is already a plan document on docs/plans/2026-04-13-001-feat-social-media-
 - Step 2 (ce-plan): DONE — docs/plans/2026-04-13-001-feat-social-media-organizer-telegram-bot-plan.md
 - Step 3 (ce-work): DONE — all 14 units implemented, 147 tests passing (all green)
 - Step 4 (ce-review): DONE — review findings applied and committed (commit: 5aa062f)
-- Step 5 (ce-compound): IN PROGRESS — solution doc written; Phase 3 reviewer may still be running in background
+- Step 5 (ce-compound): DONE — solution doc written + Phase 3 reviewer ran + two additional fixes applied and committed (bfade4b)
 
 ## What was implemented
 
@@ -42,13 +42,16 @@ All 14 plan units are complete:
 - P2: data_dir exposed as public property on ImportService
 - P3: datetime.utcnow → datetime.now(timezone.utc) in import_batch.py
 
-## ce-compound progress
+## ce-compound progress (COMPLETE)
 
-Solution doc created:
+Solution doc created and finalized:
   docs/solutions/integration-issues/missing-router-and-service-wiring-2026-04-14.md
 
-Phase 3 (Kieran Python reviewer) was dispatched in background — may not have completed.
-If next iteration picks this up: check if the reviewer returned findings and update the doc if needed.
+Phase 3 (Kieran Python reviewer) completed. Two additional fixes applied:
+- ZIP traversal: str.startswith → Path.is_relative_to() (sibling-dir bypass was real)
+- done_callback: lambda (called t.exception() twice) → named function with walrus operator
+
+All committed in bfade4b.
 
 ## What didn't work / avoid
 
