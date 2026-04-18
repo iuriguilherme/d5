@@ -93,16 +93,17 @@ class ImportService:
                     user_id, batch_id, self._session_factory, bot=bot
                 )
             )
-            task.add_done_callback(
-                lambda t: logger.error(
-                    "cluster_import_failed",
-                    user_id=user_id,
-                    batch_id=str(batch_id),
-                    error=str(t.exception()),
-                )
-                if not t.cancelled() and t.exception() is not None
-                else None
-            )
+
+            def _on_cluster_done(t: asyncio.Task) -> None:
+                if not t.cancelled() and (exc := t.exception()) is not None:
+                    logger.error(
+                        "cluster_import_failed",
+                        user_id=user_id,
+                        batch_id=str(batch_id),
+                        error=str(exc),
+                    )
+
+            task.add_done_callback(_on_cluster_done)
 
         return batch
 
@@ -115,10 +116,11 @@ class ImportService:
         extract_dir = self._data_dir / "imports" / str(batch_id)
         extract_dir.mkdir(parents=True, exist_ok=True)
 
+        safe_root = extract_dir.resolve()
         with zipfile.ZipFile(file_path) as zf:
             for member in zf.namelist():
                 member_path = (extract_dir / member).resolve()
-                if not str(member_path).startswith(str(extract_dir.resolve())):
+                if not member_path.is_relative_to(safe_root):
                     raise ValueError(f"Unsafe ZIP member path: {member!r}")
             zf.extractall(extract_dir)
 
