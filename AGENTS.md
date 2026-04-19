@@ -99,3 +99,18 @@ Prompts go in `docs/prompts/`, not `prompts/`.
   - `fix`: increment patch (`v0.0.Z`).
   - `refactor`: increment minor if breaking changes, increment patch otherwise.
   - `docs`, `chore`: do NOT tag.
+
+## Current Status (2026-04-18)
+
+Implementation: **complete** — all 14 plan units done, 147 tests passing, all CE steps finished.
+
+| CE Step | Status |
+|---|---|
+| ce-brainstorm | Done — `docs/brainstorms/social-media-organizer.md` |
+| ce-plan | Done — `docs/plans/2026-04-13-001-feat-social-media-organizer-telegram-bot-plan.md` |
+| ce-work | Done — 14 units implemented |
+| ce-review | Done — all P0–P3 findings applied (commit `5aa062f`, `bfade4b`) |
+| ce-compound | Done — solution docs in `docs/solutions/` |
+
+**Blocked / Deferred:**
+- VPS webhook deployment — no VPS capable of handling inbound webhook. Bot works in polling mode locally. When a VPS is available: deploy Docker container, configure Nginx, set `WEBHOOK_URL` env var.

@@ -772,3 +772,31 @@ Telegram ──HTTPS──► Nginx ──► Aiogram webhook server (aiohttp)
 - SQLAlchemy 2 async: https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
 - pydantic-settings v2: https://docs.pydantic.dev/latest/concepts/pydantic_settings/
 - Alembic async: https://alembic.sqlalchemy.org/en/latest/cookbook.html#using-asyncio-with-alembic
+
+
+---
+
+## Implementation Status (2026-04-18)
+
+All 14 units implemented and reviewed. 147 tests passing.
+
+| Unit | Description | Status |
+|---|---|---|
+| 1 | Project scaffolding (pyproject.toml, config.py, layout) | Done |
+| 2 | SQLAlchemy models (User, Subject, Post, Reminder, HeuristicProfile, StrategyNote, ImportBatch) | Done |
+| 3 | Alembic async migrations | Done |
+| 4 | bot/main.py — Dispatcher wiring, AllowlistMiddleware, SessionMiddleware, FSM storage | Done |
+| 5 | APScheduler setup (build_scheduler, SchedulerService, SQLAlchemyJobStore) | Done |
+| 6 | ChromaDB VectorStore wrapper | Done |
+| 7 | PredictionService (embeddings, DBSCAN clustering, LLM enrichment) | Done |
+| 8 | Heuristics + HeuristicRegistry | Done |
+| 9 | SuggestionEngine (epsilon-greedy) | Done |
+| 10 | /start handler + User/HeuristicProfile seed | Done |
+| 11 | /idea, /pool, /posted handlers | Done |
+| 12 | /schedule handler + reminder_fire_handler | Done |
+| 13 | /import handler + ImportService + platform importers | Done |
+| 14 | /strategy, /settings handlers + Docker/Nginx config | Done |
+
+## Deferred
+
+- **VPS webhook deployment** — blocked: no VPS with public HTTPS endpoint available. Bot runs in polling mode locally. Resume when infrastructure is provisioned.

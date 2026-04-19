@@ -57,6 +57,12 @@ docker compose --profile webhook up
 | `SCHEDULER_TIMEZONE` | No | `UTC` | Timezone for cron reminders |
 | `COOLDOWN_DAYS` | No | `14` | Default cooldown between re-suggesting a subject |
 
+## Current Status
+
+Implementation complete. All 14 features implemented and tested (147 tests passing).
+
+**Running in polling mode.** Webhook deployment requires a VPS with a public HTTPS endpoint — deferred until infrastructure is available.
+
 ## License
 
 AGPLv3 - see [LICENSE](./LICENSE)
