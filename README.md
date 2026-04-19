@@ -1,5 +1,7 @@
 # WDWGN
 
+[![Conventional Code](https://img.shields.io/badge/code-conventional%20🏭-red?style=for-the-badge)](https://github.com/zwbao/certified-organic-code)
+
 **Where Do We Go Now** — Telegram bot for organizing social media content subjects, tracking posting history, and receiving AI-assisted suggestions.
 
 Single-user, self-hosted, privacy-first. No cloud accounts required beyond a Telegram bot token. LLM integration is optional.
